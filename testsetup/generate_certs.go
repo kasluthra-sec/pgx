@@ -54,9 +54,9 @@ func main() {
 	serverCert := &x509.Certificate{
 		SerialNumber: big.NewInt(2),
 		Subject: pkix.Name{
-			CommonName: "postgres",
+			CommonName: "localhost",
 		},
-		DNSNames:    []string{"postgres"},
+		DNSNames:    []string{"localhost"},
 		IPAddresses: []net.IP{net.IPv4(127, 0, 0, 1), net.IPv6loopback},
 		NotBefore:   time.Now(),
 		NotAfter:    time.Now().AddDate(20, 0, 0),

@@ -11,19 +11,19 @@ This project uses Docker to provide a consistent development environment for pgx
 1. Build and start the development environment:
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 2. Run tests:
 
 ```bash
-docker-compose exec go-dev go test ./...
+docker compose exec pgx-dev go test ./...
 ```
 
 3. View skipped tests:
 
 ```bash
-docker-compose exec go-dev go test ./... -v | grep SKIP
+docker compose exec pgx-dev go test ./... -v | grep SKIP
 ```
 
 ## Environment Details
@@ -40,7 +40,7 @@ The Docker setup includes:
 To stop the development environment:
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 This will stop and remove all containers, but will keep the volumes for future use.
