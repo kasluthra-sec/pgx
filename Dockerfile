@@ -29,11 +29,12 @@ COPY --chown=postgres:postgres testsetup/ /go/src/github.com/jackc/pgx/testsetup
 RUN cd /go/src/github.com/jackc/pgx/testsetup && \
     go run generate_certs.go && \
     chmod 600 *.key && \
-    cp ca.pem /var/lib/postgresql/.testdb/postgres/ca.pem && \
     cp ca.pem /var/lib/postgresql/.testdb/postgres/root.crt && \
     cp localhost.key /var/lib/postgresql/.testdb/postgres/server.key && \
     chmod 600 /var/lib/postgresql/.testdb/postgres/server.key && \
     cp localhost.crt /var/lib/postgresql/.testdb/postgres/server.crt && \
+    # The next files are copied for convenience so we can use it on the client when testing
+    cp ca.pem /var/lib/postgresql/.testdb/postgres/ca.pem && \
     cp pgx_sslcert.key /var/lib/postgresql/.testdb/postgres/pgx_sslcert.key && \
     cp pgx_sslcert.crt /var/lib/postgresql/.testdb/postgres/pgx_sslcert.crt
 
