@@ -12,7 +12,7 @@ set password_encryption = 'scram-sha-256';
 create user pgx_pw with superuser PASSWORD 'secret';
 create user pgx_scram with superuser PASSWORD 'secret';
 \set whoami `whoami`
-create user :whoami with superuser; -- unix domain socket user
+create user root with superuser; -- unix domain socket user
 
 
 -- The tricky test user, below, has to actually exist so that it can be used in a test
