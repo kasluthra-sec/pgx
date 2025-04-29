@@ -1,60 +1,25 @@
 services:
-  cert-gen:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ./testsetup:/go/src/github.com/jackc/pgx/testsetup
-    command: >
-      sh -c 'cd testsetup && go run generate_certs.go && chmod 600 *.key'
-
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: pgx_test
-    volumes:
-      - ./testsetup:/docker-entrypoint-initdb.d
-      - pgx-socket:/var/run/postgresql
-      - ./testsetup:/var/lib/postgresql/testsetup
-    ports:
-      - "5015:5015"
-    command: >
-      postgres
-      -c listen_addresses='0.0.0.0'
-      -c port=5015
-      -c 'unix_socket_directories=/var/run/postgresql'
-      -c 'ssl=on'
-      -c 'ssl_cert_file=/var/lib/postgresql/testsetup/localhost.crt'
-      -c 'ssl_key_file=/var/lib/postgresql/testsetup/localhost.key'
-      -c 'ssl_ca_file=/var/lib/postgresql/testsetup/ca.pem'
-    depends_on:
-      - cert-gen
-
-  go-dev:
+  pgx-dev:
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - .:/go/src/github.com/jackc/pgx
-      - pgx-socket:/var/run/postgresql
-      - ./testsetup:/go/src/github.com/jackc/pgx/.testdb
+      - ./testsetup:/docker-entrypoint-initdb.d
+    ports:
+      - "5015:5015"
     environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: pgx_test
       PGDATABASE: pgx_test
       PGPORT: 5015
-      PGX_TEST_DATABASE: "host=postgres port=5015 database=pgx_test user=postgres password=secret"
+      PGX_TEST_DATABASE: "host=localhost port=5015 database=pgx_test user=postgres password=secret"
       PGX_TEST_UNIX_SOCKET_CONN_STRING: "host=/var/run/postgresql database=pgx_test"
-      PGX_TEST_TCP_CONN_STRING: "host=postgres port=5015 database=pgx_test user=postgres password=secret"
-      PGX_TEST_SCRAM_PASSWORD_CONN_STRING: "host=postgres port=5015 user=pgx_scram password=secret database=pgx_test"
-      PGX_TEST_MD5_PASSWORD_CONN_STRING: "host=postgres port=5015 database=pgx_test user=pgx_md5 password=secret"
-      PGX_TEST_PLAIN_PASSWORD_CONN_STRING: "host=postgres port=5015 user=pgx_pw password=secret"
+      PGX_TEST_TCP_CONN_STRING: "host=localhost port=5015 database=pgx_test user=postgres password=secret"
+      PGX_TEST_SCRAM_PASSWORD_CONN_STRING: "host=localhost port=5015 user=pgx_scram password=secret database=pgx_test"
+      PGX_TEST_MD5_PASSWORD_CONN_STRING: "host=localhost port=5015 database=pgx_test user=pgx_md5 password=secret"
+      PGX_TEST_PLAIN_PASSWORD_CONN_STRING: "host=localhost port=5015 user=pgx_pw password=secret"
       PGX_SSL_PASSWORD: certpw
-      PGX_TEST_TLS_CONN_STRING: "host=postgres user=pgx_ssl password=secret sslmode=verify-full sslrootcert=/go/src/github.com/jackc/pgx/.testdb/ca.pem"
-      PGX_TEST_TLS_CLIENT_CONN_STRING: "host=postgres user=pgx_sslcert sslmode=verify-full sslrootcert=/go/src/github.com/jackc/pgx/.testdb/ca.pem database=pgx_test sslcert=/go/src/github.com/jackc/pgx/.testdb/pgx_sslcert.crt sslkey=/go/src/github.com/jackc/pgx/.testdb/pgx_sslcert.key"
-    depends_on:
-      - postgres
-    command: tail -f /dev/null
-
-volumes:
-  pgx-socket:
+      PGX_TEST_TLS_CONN_STRING: "host=localhost user=pgx_ssl password=secret sslmode=verify-full sslrootcert=/go/src/github.com/jackc/pgx/testsetup/ca.pem"
+      PGX_TEST_TLS_CLIENT_CONN_STRING: "host=localhost user=pgx_sslcert sslmode=verify-full sslrootcert=/go/src/github.com/jackc/pgx/testsetup/ca.pem database=pgx_test sslcert=/go/src/github.com/jackc/pgx/testsetup/pgx_sslcert.crt sslkey=/go/src/github.com/jackc/pgx/testsetup/pgx_sslcert.key"
