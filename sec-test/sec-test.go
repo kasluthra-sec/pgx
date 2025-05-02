@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/google/go-safeweb/safesql"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -18,7 +19,7 @@ func main() {
 	defer conn.Close(context.Background())
 
 	var version string
-	err = conn.QueryRow(context.Background(), "SELECT version();").Scan(&version)
+	err = conn.QueryRow(context.Background(), safesql.New("SELECT version();")).Scan(&version)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to query version: %v\n", err)
 		os.Exit(1)
