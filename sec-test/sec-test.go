@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	connStr := "host=127.0.0.1 port=5015 user=pgx_md5 password=secret dbname=pgx_test sslmode=disable"
+	connStr := "host=localhost port=5015 user=pgx_md5 password=secret dbname=pgx_test sslmode=disable"
 	conn, err := pgx.Connect(context.Background(), connStr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)

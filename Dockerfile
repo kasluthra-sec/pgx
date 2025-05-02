@@ -45,11 +45,11 @@ COPY --chown=postgres:postgres testsetup/pg_hba.conf /var/lib/postgresql/.testdb
 # Configure PostgreSQL
 ENV PGDATABASE=pgx_test
 
-RUN echo "listen_addresses = '127.0.0.1'" >> /var/lib/postgresql/.testdb/postgres/postgresql.conf && \
+RUN echo "listen_addresses = '*'" >> /var/lib/postgresql/.testdb/postgres/postgresql.conf && \
     echo "port = 5015" >> /var/lib/postgresql/.testdb/postgres/postgresql.conf && \
     cat /var/lib/postgresql/.testdb/postgres/postgresql_ssl.conf >> /var/lib/postgresql/.testdb/postgres/postgresql.conf
 
-RUN pg_ctl -D /var/lib/postgresql/.testdb/postgres -o "-c listen_addresses='localhost'" -w start && \
+RUN pg_ctl -D /var/lib/postgresql/.testdb/postgres -o "-c listen_addresses='*'" -w start && \
     createdb -p 5015 && \
     psql --no-psqlrc -U postgres -p 5015 -f /go/src/github.com/jackc/pgx/testsetup/postgresql_setup.sql && \
     pg_ctl -D /var/lib/postgresql/.testdb/postgres -m fast -w stop
