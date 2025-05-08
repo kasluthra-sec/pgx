@@ -902,7 +902,7 @@ func (c *Conn) getStatementDescription(
 // querying is deferred until calling Scan on the returned Row. That Row will
 // error with ErrNoRows if no rows are returned.
 func (c *Conn) QueryRow(ctx context.Context, sql safesql.TrustedSQLString, args ...any) Row {
-	rows, _ := c.Query(ctx, sql.String(), args...)
+	rows, _ := c.Query(ctx, sql, args...)
 	return (*connRow)(rows.(*baseRows))
 }
 
