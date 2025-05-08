@@ -1,8 +1,9 @@
-We need to refactor this project so that it is using the safesql package while trying to keep the API and implementation as similar as possible to the current one. Documentation for safesql can be found here on https://pkg.go.dev/github.com/google/go-safeweb/safesql and also contains examples.
+We need to refactor this project so that it is using the safesql package. Documentation for safesql can be found here on https://pkg.go.dev/github.com/google/go-safeweb/safesql and also contains examples.
 Do not use uncheckedconversions or legacyconversions, if this is the only way to proceed, then take note of where this is required.
 Do not convert safesql.TrustedSQLString to a regular string unless it is the only way to proceed or it is safe to do so.
 
-To prepare for the refactoring, analyse the call path for the QueryRow method in conn.go as used by our test script in sec-test/sec-test.go. You will need to make changes to the QueryRow method in conn.go to make it compatible with safesql. I have already updated the method to use safesql.TrustedSQLString instead of a regular string and pass that on to the c.Query method. You see that it throws an error becauase Query still expects a string. Go update the Query method so that it supports safesql.TrustedSQLString and passes that on to any and all methods that it uses. In turn, you also have to update those methods and any and all methods that they use and so forth until you have updated all methods that are being used by Query. Do not patch any other methods including other methods that call Query. Focus on the call path used by sec-test.go first. 
+To prepare for the refactoring, analyse the call path for the QueryRow method in conn.go as used by our test script in sec-test/sec-test.go. You will need to make changes to the QueryRow method in conn.go to make it compatible with safesql. I have already updated the method to use safesql.TrustedSQLString instead of a regular string and pass that on to the c.Query method. You see that it throws an error because Query still expects a string. Go update the Query method so that it supports safesql.TrustedSQLString and passes that on to any and all methods that it uses. In turn, you also have to update those methods and any and all methods that they use and so forth until you have updated all methods that are being used by Query. This might also need updates to other methods that are using any of the updated methods including interfaces. Make sure that the entire package (except for tests, we do that later) supports safesql.TrustedSQLString types instead of strings while still maintaining the original functionality.
+ocus on the call path used by sec-test.go first. 
 Do NOT patch any of the tests yet. They will fail and that is ok for now, we come back to this later.
 If you have to introduce imports, only use "github.com/google/go-safeweb/safesql" and nothing else. If other imports are needed, check with me first and I can fix those dependencies before you proceed.
 
@@ -18,5 +19,6 @@ Start with crafting a refactor plan. Create a TODO list in a new file called TOD
 - Check your work for syntax errors and logic errors and correctness
 - Test using sec-test.go but do not change the test script
 - Do NOT run other tests
+- Never use sqlStr := string(sql) or something similar. You should NEVER convert the safesql type back to a string but just update all methods so that they accept safesql.TrustedSQLString instead of a string.
 
 The sqlx package has been refactored earlier to work with safesql and can be referenced for examples: https://github.com/jmoiron/sqlx/pull/958/files.
